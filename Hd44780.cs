@@ -151,6 +151,8 @@ namespace tmp102
 
         protected void SendData(byte value)
         {
+            Console.WriteLine("Send data: 0x{0:x2}", value);
+
             Span<byte> buffer = stackalloc byte[2];
             buffer[0] = 0x00;
 
@@ -177,6 +179,8 @@ namespace tmp102
 
         protected void SendCommand(byte cmd)
         {
+            Console.WriteLine("Send cmd: 0x{0:x2}", cmd);
+            
             Span<byte> buffer = stackalloc byte[2];
             buffer[0] = 0x00;
 
