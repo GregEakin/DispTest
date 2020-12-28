@@ -10,6 +10,17 @@ using Iot.Device.CharacterLcd;
 
 namespace tmp102
 {
+    public class Lcd : Lcd1602
+    {
+        public Lcd(I2cDevice device)
+            : base(device)
+        {
+            Console.WriteLine("Eight bit mode = ", _interface.EightBitMode);
+        }
+
+    }
+
+
     class Program
     {
         // private static int OPEN_READ_ONLY = 0;
@@ -68,12 +79,13 @@ namespace tmp102
         {
             var settings = new I2cConnectionSettings(0x00, 0x27);
             using var device = new UnixI2cDevice(settings);
+            Console.WriteLine("Connection {0}", device.ConnectionSettings);
+            Console.WriteLine("device path {0}", device.DevicePath);
+            
             // using var lcd = new Lcd1602(18, 5, new int[] { 6, 16, 20, 21 });
-            using var lcd = new Lcd1602(device)
-            {
-                DisplayOn = true, 
-                BacklightOn = true
-            };
+            using var lcd = new Lcd(device);
+            
+            lcd.DisplayOn = true;
             
             lcd.Clear();
             lcd.Home();
@@ -83,7 +95,6 @@ namespace tmp102
 
             lcd.Clear();
             lcd.DisplayOn = false;
-            lcd.BacklightOn = false;
         }
 
         public static void Main3(string[] args)
