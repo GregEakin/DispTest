@@ -141,29 +141,8 @@ namespace tmp102
             WaitForNotBusy(37);
             SendNibble(0x20);        // Function set 0b0010 - 4-bit, as first 4-bit
             WaitForNotBusy(37);
-            SendNibble(0x80);        // Function set 0bnn** - 2-line, Font, as second 4-bit
+            SendNibble(0xC0);        // Function set 0bnn** - 2-line, Font, as second 4-bit
             WaitForNotBusy(37);
-
-            // Display on
-            // buffer[1] = 0x00;
-            // _interface.SendData(buffer);        // Display set 0b0000
-            // buffer[1] = 0xC0;
-            // _interface.SendData(buffer);        // Display set 0b1nnn - Display, Cursor, Blink
-            // WaitForNotBusy(37);
-            
-            // Clear entire display
-            // buffer[1] = 0x00;
-            // _interface.SendData(buffer);        // Clear display 0b0000
-            // buffer[1] = 0x10;
-            // _interface.SendData(buffer);        // Clear display 0b0001 - Clear entire display
-            // // WaitForNotBusy(4100);
-            
-            // Set Mode
-            // buffer[1] = 0x00;
-            // _interface.SendData(buffer);        // Entry Mode set 0b0000
-            // buffer[1] = 0x60;
-            // _interface.SendData(buffer);        // Entry Mode set 0b01nn - I/D and S
-            // WaitForNotBusy(37);
 
             // While the chip supports 5x10 pixel characters for one line displays they
             // don't seem to be generally available. Supporting 5x10 would require extra
@@ -198,33 +177,6 @@ namespace tmp102
         {
             get => _interface.BacklightOn;
             set => _interface.BacklightOn = value;
-        }
-
-        protected void SendData(byte value)
-        {
-            Span<byte> buffer = stackalloc byte[2];
-            buffer[0] = 0x00;
-
-            // Wait for busy flag
-
-            buffer[1] = (byte)((value & 0xF0) | 0x09);
-            _interface.SendData(buffer);
-            WaitForNotBusy(4);
-            buffer[1] = (byte)((value & 0xF0) | 0x09 | 0x04u);
-            _interface.SendData(buffer);
-            WaitForNotBusy(4);
-            buffer[1] = (byte)((value & 0xF0) | 0x09);
-            _interface.SendData(buffer);
-            WaitForNotBusy(37);
-            buffer[1] = (byte)((value << 4) | 0x09);
-            _interface.SendData(buffer);
-            WaitForNotBusy(4);
-            buffer[1] = (byte)((value << 4) | 0x09 | 0x04u);
-            _interface.SendData(buffer);
-            WaitForNotBusy(4);
-            buffer[1] = (byte)((value << 4) | 0x09);
-            _interface.SendData(buffer);
-            WaitForNotBusy(37);
         }
 
         protected void SendNibble(byte cmd)
@@ -268,11 +220,31 @@ namespace tmp102
             WaitForNotBusy(37);
         }
 
-
-        protected void SendData(ReadOnlySpan<byte> values)
+        protected void SendData(byte value)
         {
-            foreach (var value in values)
-                SendData(value);
+            Span<byte> buffer = stackalloc byte[2];
+            buffer[0] = 0x00;
+
+            // Wait for busy flag
+
+            buffer[1] = (byte)((value & 0xF0) | 0x09);
+            _interface.SendData(buffer);
+            WaitForNotBusy(4);
+            buffer[1] = (byte)((value & 0xF0) | 0x09 | 0x04u);
+            _interface.SendData(buffer);
+            WaitForNotBusy(4);
+            buffer[1] = (byte)((value & 0xF0) | 0x09);
+            _interface.SendData(buffer);
+            WaitForNotBusy(37);
+            buffer[1] = (byte)((value << 4) | 0x09);
+            _interface.SendData(buffer);
+            WaitForNotBusy(4);
+            buffer[1] = (byte)((value << 4) | 0x09 | 0x04u);
+            _interface.SendData(buffer);
+            WaitForNotBusy(4);
+            buffer[1] = (byte)((value << 4) | 0x09);
+            _interface.SendData(buffer);
+            WaitForNotBusy(37);
         }
 
         protected void SendCommands(ReadOnlySpan<byte> commands) // => _interface.SendCommands(commands);
@@ -287,6 +259,11 @@ namespace tmp102
                 SendCommand(cmd);
         }
 
+        protected void SendData(ReadOnlySpan<byte> values)
+        {
+            foreach (var value in values)
+                SendData(value);
+        }
 
         protected virtual bool SetTwoLineMode(int rows) => rows > 1;
 
