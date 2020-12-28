@@ -4,6 +4,7 @@ using System.Device.I2c.Drivers;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace tmp102
 {
@@ -37,24 +38,30 @@ namespace tmp102
             byte uca = cmd;
             uca = (byte)((cmd & 0xF0u) | backlight);
             device.WriteByte(uca);
+            Task.Delay(1);
 
             uca = (byte)((cmd & 0xF0u) | backlight | 0x04u);
             device.WriteByte(uca);
+            Task.Delay(1);
 
             uca = (byte)((cmd & 0xF0u) | backlight);
             device.WriteByte(uca);
+            Task.Delay(1);
 
             uca = (byte)((cmd << 4) | backlight);
             device.WriteByte(uca);
+            Task.Delay(1);
 
             uca = (byte)((cmd << 4) | backlight | 0x04u);
             device.WriteByte(uca);
+            Task.Delay(1);
 
             uca = (byte)((cmd << 4) | backlight);
             device.WriteByte(uca);
+            Task.Delay(1);
         }
-        
-        
+
+
         public static void Main(string[] args)
         {
             var settings = new I2cConnectionSettings(0x00, 0x27);
