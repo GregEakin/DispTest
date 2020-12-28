@@ -4,6 +4,10 @@
 // 
 // Greg Eakin <greg@eakin.dev>
 
+// Data Sheets
+// https://www.sparkfun.com/datasheets/LCD/HD44780.pdf
+// https://www.nxp.com/docs/en/data-sheet/PCF8574_PCF8574A.pdf
+
 using Iot.Device.CharacterLcd;
 using System;
 using System.Buffers;
