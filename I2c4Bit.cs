@@ -41,19 +41,19 @@ namespace tmp102
         protected void Initialize()
         {
             // Send command three three time to get chip into 8-bit mode.
-            SendNibble(0x03);        // Function set 0b0011 - 8-bit
-            WaitForNotBusy(4100);
-            SendNibble(0x03);        // Function set 0b0011 - 8-bit
-            WaitForNotBusy(100);
-            SendNibble(0x03);        // Function set 0b0011 - 8-bit
-            WaitForNotBusy(37);
+            SendNibble(0x30);        // Function set 0b0011 - 8-bit
+            WaitForNotBusy(4500);
+            SendNibble(0x30);        // Function set 0b0011 - 8-bit
+            WaitForNotBusy(4500);
+            SendNibble(0x30);        // Function set 0b0011 - 8-bit
+            WaitForNotBusy(150);
 
             // Set 4-bit mode, 2-Line and font
-            SendNibble(0x02);        // Function set 0b0010 - 4-bit, as an 8-bit instruction
+            SendNibble(0x20);        // Function set 0b0010 - 4-bit, as an 8-bit instruction
             WaitForNotBusy(37);
-            SendNibble(0x02);        // Function set 0b0010 - 4-bit, as first 4-bit
+            SendNibble(0x20);        // Function set 0b0010 - 4-bit, as first 4-bit
             WaitForNotBusy(37);
-            SendNibble(0x0C);        // Function set 0bnn** - 2-line, Font, as second 4-bit
+            SendNibble(0xC0);        // Function set 0bnn** - 2-line, Font, as second 4-bit
             WaitForNotBusy(37);
 
             // Number of display lines, and  font cannot be changed after this command 
@@ -79,8 +79,8 @@ namespace tmp102
             // Wait for busy flag
             var flag = (byte)(BacklightOn ? ControlByteFlags.Backlight : 0x00);
 
-            SendNibble((byte)((command >> 4) | flag));
             SendNibble((byte)((command & 0x0F) | flag));
+            SendNibble((byte)((command << 4) | flag));
         }
 
         public override void SendCommands(ReadOnlySpan<byte> commands)
