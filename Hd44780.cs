@@ -209,28 +209,26 @@ namespace tmp102
 
             buffer[1] = (byte)((value & 0xF0) | 0x09);
             _interface.SendData(buffer);
-            WaitForNotBusy(500);
+            WaitForNotBusy(4);
             buffer[1] = (byte)((value & 0xF0) | 0x09 | 0x04u);
             _interface.SendData(buffer);
-            WaitForNotBusy(500);
+            WaitForNotBusy(4);
             buffer[1] = (byte)((value & 0xF0) | 0x09);
             _interface.SendData(buffer);
-            WaitForNotBusy(4100);
+            WaitForNotBusy(37);
             buffer[1] = (byte)((value << 4) | 0x09);
             _interface.SendData(buffer);
-            WaitForNotBusy(500);
+            WaitForNotBusy(4);
             buffer[1] = (byte)((value << 4) | 0x09 | 0x04u);
             _interface.SendData(buffer);
-            WaitForNotBusy(500);
+            WaitForNotBusy(4);
             buffer[1] = (byte)((value << 4) | 0x09);
             _interface.SendData(buffer);
-            WaitForNotBusy(4100);
+            WaitForNotBusy(37);
         }
 
         protected void SendNibble(byte cmd)
         {
-            Console.WriteLine("Send nibble: 0x{0:x2}", cmd);
-
             Span<byte> buffer = stackalloc byte[2];
             buffer[0] = 0x00;
 
@@ -245,8 +243,6 @@ namespace tmp102
 
         protected void SendCommand(byte cmd)
         {
-            Console.WriteLine("Send cmd: 0x{0:x2}", cmd);
-
             Span<byte> buffer = stackalloc byte[2];
             buffer[0] = 0x00;
 
@@ -254,22 +250,22 @@ namespace tmp102
 
             buffer[1] = (byte)((cmd & 0xF0) | 0x08);
             _interface.SendData(buffer);
-            WaitForNotBusy(500);
+            WaitForNotBusy(4);
             buffer[1] = (byte)((cmd & 0xF0) | 0x08 | 0x04u);
             _interface.SendData(buffer);
-            WaitForNotBusy(500);
+            WaitForNotBusy(4);
             buffer[1] = (byte)((cmd & 0xF0) | 0x08);
             _interface.SendData(buffer);
-            WaitForNotBusy(4100);
+            WaitForNotBusy(37);
             buffer[1] = (byte)((cmd << 4) | 0x08);
             _interface.SendData(buffer);
-            WaitForNotBusy(500);
+            WaitForNotBusy(4);
             buffer[1] = (byte)((cmd << 4) | 0x08 | 0x04u);
             _interface.SendData(buffer);
-            WaitForNotBusy(500);
+            WaitForNotBusy(4);
             buffer[1] = (byte)((cmd << 4) | 0x08);
             _interface.SendData(buffer);
-            WaitForNotBusy(4100);
+            WaitForNotBusy(37);
         }
 
 
