@@ -150,7 +150,26 @@ namespace tmp102
 
         protected void SendData(byte value)
         {
-            throw new NotImplementedException("Can't send just data.");
+            Span<byte> buffer = stackalloc byte[2];
+            buffer[0] = 0x00;
+
+            buffer[1] = (byte)((value & 0xF0) | 0x01);
+            _interface.SendData(buffer);
+
+            buffer[1] = (byte)((value & 0xF0) | 0x01 | 0x04u);
+            _interface.SendData(buffer);
+
+            buffer[1] = (byte)((value & 0xF0) | 0x01);
+            _interface.SendData(buffer);
+
+            buffer[1] = (byte)((value << 4) | 0x01);
+            _interface.SendData(buffer);
+
+            buffer[1] = (byte)((value << 4) | 0x01 | 0x04u);
+            _interface.SendData(buffer);
+
+            buffer[1] = (byte)((value << 4) | 0x01);
+            _interface.SendData(buffer);
         }
 
         protected void SendCommand(byte cmd)
@@ -180,7 +199,8 @@ namespace tmp102
 
         protected void SendData(ReadOnlySpan<byte> values)
         {
-            throw new NotImplementedException("Can't send just data.");
+            foreach (var value in values)
+                SendData(value);
         }
 
         protected void SendCommands(ReadOnlySpan<byte> commands) // => _interface.SendCommands(commands);
