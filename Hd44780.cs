@@ -47,6 +47,15 @@ namespace tmp102
         Command = 16, // 0x10
     }
 
+    [Flags]
+    internal enum BusControl : byte
+    {
+        Data = 1,
+        Write = 2,
+        Enabled = 4,
+        Backlight = 8
+    }
+
     /// <summary>
     /// Supports LCD character displays compatible with the HD44780 LCD controller/driver.
     /// Also supports serial interface adapters such as the MCP23008.
