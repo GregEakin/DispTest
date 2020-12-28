@@ -16,8 +16,10 @@ namespace tmp102
             : base(device)
         {
             Console.WriteLine("Eight bit mode = {0}", _interface.EightBitMode); // True
-            Console.WriteLine("Wait {0}", _interface.WaitMultiplier);           // 
+            Console.WriteLine("Wait {0}", _interface.WaitMultiplier);           // 1
             Console.WriteLine("Size {0}x{1}", Size.Width, Size.Height);         // 16x2
+
+            _interface.WaitMultiplier = 2;
         }
 
     }
