@@ -145,9 +145,9 @@ namespace tmp102
                 (byte)_displayFunction,     // 0x28
                 (byte)_displayControl,      // 0x0c
                 (byte)_displayMode,         // 0x06
-                ClearDisplayCommand,        // 0x80
-                (byte)0x80
-                // @@ Clear                 // 0x0E <-- not valid?
+                ClearDisplayCommand,        // 0x01
+                (byte)0x80,                 // 0x80
+                (byte)0x0E,                 // 0x0E <-- not valid?
             };
 
             SendCommands(commands);
