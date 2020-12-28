@@ -61,16 +61,17 @@ namespace tmp102
 
         protected void SendNibble(byte command)
         {
-            Span<byte> buffer = stackalloc byte[] { 0x00, (byte)(command & ~0x04u) };
+            Span<byte> buffer = stackalloc byte[] { 0x00, (byte)(command & ~(byte)ControlByteFlags.Enabled) };
             _device.Write(buffer);
+            WaitForNotBusy(24);
 
             buffer[1] = (byte)(command | (byte)ControlByteFlags.Enabled);
             _device.Write(buffer);
-            WaitForNotBusy(1);
+            WaitForNotBusy(24);
 
             buffer[1] = (byte)(command & ~(byte)ControlByteFlags.Enabled);
             _device.Write(buffer);
-            WaitForNotBusy(50);
+            WaitForNotBusy(24);
         }
 
         public override void SendCommand(byte command)
@@ -78,7 +79,7 @@ namespace tmp102
             // Wait for busy flag
             var flag = (byte)(BacklightOn ? ControlByteFlags.Backlight : 0x00);
 
-            SendNibble((byte)((command & 0x0F) | flag));
+            SendNibble((byte)((command & 0xF0) | flag));
             SendNibble((byte)((command << 4) | flag));
         }
 
@@ -98,9 +99,9 @@ namespace tmp102
         public override void SendData(byte value)
         {
             // Wait for busy flag
-            var flag = (byte)(BacklightOn ? ControlByteFlags.Backlight : 0x00 | ControlByteFlags.Data);
+            var flag = (byte)(ControlByteFlags.Data | (BacklightOn ? ControlByteFlags.Backlight : 0x00));
 
-            SendNibble((byte)((value & 0x0F) | flag));
+            SendNibble((byte)((value & 0xF0) | flag));
             SendNibble((byte)((value << 4) | flag));
         }
 
