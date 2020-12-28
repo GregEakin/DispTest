@@ -89,7 +89,7 @@ namespace tmp102
             // }
 
             // using var lcd = new Lcd1602(18, 5, new int[] { 6, 16, 20, 21 });
-            var lcd = new Lcd1602(device);
+            var lcd = new Lcd(device);
 
             lcd.DisplayOn = true;
             
