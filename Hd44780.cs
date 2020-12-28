@@ -108,6 +108,18 @@ namespace tmp102
         /// </summary>
         private void Initialize(int rows)
         {
+            // Go into 4-bit mode.
+            Span<byte> buffer = stackalloc byte[2];
+            buffer[0] = 0x00;
+            buffer[1] = 0x30;
+            _interface.SendData(buffer);
+            Thread.Sleep(5);
+            _interface.SendData(buffer);
+            Thread.Sleep(1);
+            _interface.SendData(buffer);
+            Thread.Sleep(5);
+            buffer[1] = 0x20;
+
             // While the chip supports 5x10 pixel characters for one line displays they
             // don't seem to be generally available. Supporting 5x10 would require extra
             // support for CreateCustomCharacter
@@ -158,9 +170,11 @@ namespace tmp102
 
             buffer[1] = (byte)((value & 0xF0) | 0x09);
             _interface.SendData(buffer);
+            Thread.Sleep(1);
 
             buffer[1] = (byte)((value & 0xF0) | 0x09 | 0x04u);
             _interface.SendData(buffer);
+            Thread.Sleep(1);
 
             buffer[1] = (byte)((value & 0xF0) | 0x09);
             _interface.SendData(buffer);
@@ -168,9 +182,11 @@ namespace tmp102
 
             buffer[1] = (byte)((value << 4) | 0x09);
             _interface.SendData(buffer);
+            Thread.Sleep(1);
 
             buffer[1] = (byte)((value << 4) | 0x09 | 0x04u);
             _interface.SendData(buffer);
+            Thread.Sleep(1);
 
             buffer[1] = (byte)((value << 4) | 0x09);
             _interface.SendData(buffer);
@@ -186,9 +202,11 @@ namespace tmp102
 
             buffer[1] = (byte) ((cmd & 0xF0) | 0x08);
             _interface.SendData(buffer);
+            Thread.Sleep(1);
 
             buffer[1] = (byte) ((cmd & 0xF0) | 0x08 | 0x04u);
             _interface.SendData(buffer);
+            Thread.Sleep(1);
 
             buffer[1] = (byte) ((cmd & 0xF0) | 0x08);
             _interface.SendData(buffer);
@@ -196,9 +214,11 @@ namespace tmp102
 
             buffer[1] = (byte) ((cmd << 4) | 0x08);
             _interface.SendData(buffer);
+            Thread.Sleep(1);
 
             buffer[1] = (byte) ((cmd << 4) | 0x08 | 0x04u);
             _interface.SendData(buffer);
+            Thread.Sleep(1);
 
             buffer[1] = (byte) ((cmd << 4) | 0x08);
             _interface.SendData(buffer);
