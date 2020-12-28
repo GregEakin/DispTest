@@ -19,10 +19,10 @@ namespace tmp102
         [Flags]
         private enum ControlByteFlags : byte
         {
-            Data = 0b_0001_0000,
-            Read = 0b_0010_0000,
-            Enabled = 0b_0100_0000,
-            Backlight = 0b_1000_0000,
+            Data = 0b_0000_0001,
+            Read = 0b_0000_0010,
+            Enabled = 0b_0000_0100,
+            Backlight = 0b_0000_1000,
         }
 
         private readonly I2cDevice _device;
@@ -79,7 +79,7 @@ namespace tmp102
             // Wait for busy flag
             var flag = (byte)(BacklightOn ? ControlByteFlags.Backlight : 0x00);
 
-            SendNibble((byte)((command & 0x0F) | flag));
+            SendNibble((byte)((command & 0xF0) | flag));
             SendNibble((byte)((command << 4) | flag));
         }
 
