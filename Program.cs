@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Iot.Device.CharacterLcd;
 
 namespace tmp102
 {
@@ -33,7 +34,7 @@ namespace tmp102
         [DllImport("libc.so.6", EntryPoint = "usleep")]
         internal static extern int usleep(uint useconds);
 
-        public static void Write(UnixI2cDevice device, byte cmd, byte backlight)
+        public static void Write(I2cDevice device, byte cmd, byte backlight)
         {
             byte uca = cmd;
             uca = (byte)((cmd & 0xF0u) | backlight);
@@ -63,6 +64,15 @@ namespace tmp102
 
 
         public static void Main(string[] args)
+        {
+            var settings = new I2cConnectionSettings(0x00, 0x27);
+            using var device = new UnixI2cDevice(settings);
+            // using var lcd = new Lcd1602(18, 5, new int[] { 6, 16, 20, 21 });
+            using var lcd = new Lcd1602(device);
+            lcd.Write("Hello World!");
+        }
+
+        public static void Main3(string[] args)
         {
             var settings = new I2cConnectionSettings(0x00, 0x27);
             using var device = new UnixI2cDevice(settings);
