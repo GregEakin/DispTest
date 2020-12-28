@@ -19,10 +19,10 @@ namespace tmp102
         [Flags]
         private enum ControlByteFlags : byte
         {
-            Data = 0b_0000_0001,
-            Read = 0b_0000_0010,
-            Enabled = 0b_0000_0100,
-            Backlight = 0b_0000_1000,
+            Data = 0b_0001_0000,
+            Read = 0b_0010_0000,
+            Enabled = 0b_0100_0000,
+            Backlight = 0b_1000_0000,
         }
 
         private readonly I2cDevice _device;
@@ -41,19 +41,19 @@ namespace tmp102
         protected void Initialize()
         {
             // Send command three three time to get chip into 8-bit mode.
-            SendNibble(0x30);        // Function set 0b0011 - 8-bit
+            SendNibble(0x03);        // Function set 0b0011 - 8-bit
             WaitForNotBusy(4100);
-            SendNibble(0x30);        // Function set 0b0011 - 8-bit
+            SendNibble(0x03);        // Function set 0b0011 - 8-bit
             WaitForNotBusy(100);
-            SendNibble(0x30);        // Function set 0b0011 - 8-bit
+            SendNibble(0x03);        // Function set 0b0011 - 8-bit
             WaitForNotBusy(37);
 
             // Set 4-bit mode, 2-Line and font
-            SendNibble(0x20);        // Function set 0b0010 - 4-bit, as an 8-bit instruction
+            SendNibble(0x02);        // Function set 0b0010 - 4-bit, as an 8-bit instruction
             WaitForNotBusy(37);
-            SendNibble(0x20);        // Function set 0b0010 - 4-bit, as first 4-bit
+            SendNibble(0x02);        // Function set 0b0010 - 4-bit, as first 4-bit
             WaitForNotBusy(37);
-            SendNibble(0xC0);        // Function set 0bnn** - 2-line, Font, as second 4-bit
+            SendNibble(0x0C);        // Function set 0bnn** - 2-line, Font, as second 4-bit
             WaitForNotBusy(37);
 
             // Number of display lines, and  font cannot be changed after this command 
@@ -79,8 +79,8 @@ namespace tmp102
             // Wait for busy flag
             var flag = (byte)(BacklightOn ? ControlByteFlags.Backlight : 0x00);
 
-            SendNibble((byte)((command & 0xF0) | flag));
-            SendNibble((byte)((command << 4) | flag));
+            SendNibble((byte)((command >> 4) | flag));
+            SendNibble((byte)((command & 0x0F) | flag));
         }
 
         public override void SendCommands(ReadOnlySpan<byte> commands)
