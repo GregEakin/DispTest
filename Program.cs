@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Device.I2c;
+using System.Device.I2c.Drivers;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace tmp102
 {
@@ -31,6 +34,26 @@ namespace tmp102
 
         public static void Main(string[] args)
         {
+            var settings = new I2cConnectionSettings(0x00, 0x27);
+            using var device = new UnixI2cDevice(settings);
+
+            // Init
+            device.WriteByte(0x02);  // Set 4-bit mode of LCD controller
+            device.WriteByte(0x28);  // 2 line, 5x8 dot matrix
+            device.WriteByte(0x0C);  // display on, cursor off
+            device.WriteByte(0x06);  // inc cursor to right when writing and don't scroll
+            device.WriteByte(0x80);  // set cursor to row 1, column 1
+
+            // Clear the screen
+            device.WriteByte(0x0E);  // Clear the memory
+
+            // Test Msg
+            var message = Encoding.ASCII.GetBytes("DOTNET 5.0");
+            device.Write(message);
+        }
+
+        public static void Main2(string[] args)
+        {
             // read from I2C device bus 0
             var bus = 0;
             var handle = Open($"/dev/i2c-{bus}", OPEN_READ_WRITE);
@@ -55,7 +78,7 @@ namespace tmp102
             WriteCommand(handle, 0x80, 0x08); // set cursor to row 1, column 1
 
             // Clear the screen
-            WriteCommand(handle, 0x0E, 0x08); // Clear the memroy
+            WriteCommand(handle, 0x0E, 0x08); // Clear the memory
 
             // Test Msg
             WriteString(handle, "Greg was here!", 0x08);

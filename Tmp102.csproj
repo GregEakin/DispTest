@@ -6,4 +6,8 @@
     <RuntimeIdentifiers>win10-arm;ubuntu.16.04-arm;linux-arm</RuntimeIdentifiers>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.Device.Gpio" Version="0.1.0-prerelease.19251.2" />
+  </ItemGroup>
+
 </Project>
