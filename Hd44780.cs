@@ -123,40 +123,25 @@ namespace tmp102
         {
             // Setup 4-bit mode
             // See Figure 24, on page 46
-
-            // Go into 4-bit mode.
-            Span<byte> buffer = stackalloc byte[2];
-            buffer[0] = 0x00;   // Space for I2C address
-            buffer[1] = 0x30;   // Function set
-
-            // Wait for startup
+            
+	    // Wait for startup
             WaitForNotBusy(15000);
 
             // Send three three time to get chip into sync
-            _interface.SendData(buffer);        // Function set 0b0011 - 8-bit
-            // Toggle E
+            SendNibble(0x30);        // Function set 0b0011 - 8-bit
             WaitForNotBusy(4100);
-            
-            _interface.SendData(buffer);        // Function set 0b0011 - 8-bit
-            // Toggle E
+            SendNibble(0x30);        // Function set 0b0011 - 8-bit
             WaitForNotBusy(100);
-            
-            _interface.SendData(buffer);        // Function set 0b0011 - 8-bit
-            // Toggle E
+            SendNibble(0x30);        // Function set 0b0011 - 8-bit
             WaitForNotBusy(37);
 
             // Set 4-bit mode, 2-Line and font
             // Number of display lines, and  font cannot be changed after this command 
-            buffer[1] = 0x20;
-            _interface.SendData(buffer);        // Function set 0b0010 - 4-bit, as an 8-bit instruction
-            // Toggle E
+            SendNibble(0x20);        // Function set 0b0010 - 4-bit, as an 8-bit instruction
             WaitForNotBusy(37);
-            _interface.SendData(buffer);        // Function set 0b0010 - 4-bit, as first 4-bit
-            // Toggle E
+            SendNibble(0x20);        // Function set 0b0010 - 4-bit, as first 4-bit
             WaitForNotBusy(37);
-            buffer[1] = 0x80;
-            _interface.SendData(buffer);        // Function set 0bnn** - 2-line, Font, as second 4-bit
-            // Toggle E
+            SendNibble(0x80);        // Function set 0bnn** - 2-line, Font, as second 4-bit
             WaitForNotBusy(37);
 
             // Display on
@@ -224,17 +209,37 @@ namespace tmp102
 
             buffer[1] = (byte)((value & 0xF0) | 0x09);
             _interface.SendData(buffer);
+            WaitForNotBusy(500);
             buffer[1] = (byte)((value & 0xF0) | 0x09 | 0x04u);
             _interface.SendData(buffer);
-            WaitForNotBusy(4);
+            WaitForNotBusy(500);
             buffer[1] = (byte)((value & 0xF0) | 0x09);
             _interface.SendData(buffer);
+            WaitForNotBusy(4100);
             buffer[1] = (byte)((value << 4) | 0x09);
             _interface.SendData(buffer);
+            WaitForNotBusy(500);
             buffer[1] = (byte)((value << 4) | 0x09 | 0x04u);
             _interface.SendData(buffer);
-            WaitForNotBusy(4);
+            WaitForNotBusy(500);
             buffer[1] = (byte)((value << 4) | 0x09);
+            _interface.SendData(buffer);
+            WaitForNotBusy(4100);
+        }
+
+        protected void SendNibble(byte cmd)
+        {
+            Console.WriteLine("Send nibble: 0x{0:x2}", cmd);
+
+            Span<byte> buffer = stackalloc byte[2];
+            buffer[0] = 0x00;
+
+            buffer[1] = (byte)((cmd & 0xF0) | 0x08);
+            _interface.SendData(buffer);
+            buffer[1] = (byte)((cmd & 0xF0) | 0x08 | 0x04u);
+            _interface.SendData(buffer);
+            WaitForNotBusy(4);
+            buffer[1] = (byte)((cmd & 0xF0) | 0x08);
             _interface.SendData(buffer);
         }
 
@@ -249,18 +254,22 @@ namespace tmp102
 
             buffer[1] = (byte)((cmd & 0xF0) | 0x08);
             _interface.SendData(buffer);
+            WaitForNotBusy(500);
             buffer[1] = (byte)((cmd & 0xF0) | 0x08 | 0x04u);
             _interface.SendData(buffer);
-            WaitForNotBusy(4);
+            WaitForNotBusy(500);
             buffer[1] = (byte)((cmd & 0xF0) | 0x08);
             _interface.SendData(buffer);
+            WaitForNotBusy(4100);
             buffer[1] = (byte)((cmd << 4) | 0x08);
             _interface.SendData(buffer);
+            WaitForNotBusy(500);
             buffer[1] = (byte)((cmd << 4) | 0x08 | 0x04u);
             _interface.SendData(buffer);
-            WaitForNotBusy(4);
+            WaitForNotBusy(500);
             buffer[1] = (byte)((cmd << 4) | 0x08);
             _interface.SendData(buffer);
+            WaitForNotBusy(4100);
         }
 
 
