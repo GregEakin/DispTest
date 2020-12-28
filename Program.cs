@@ -46,7 +46,7 @@ namespace tmp102
 
             uca = (byte)((cmd & 0xF0u) | backlight);
             device.WriteByte(uca);
-            Task.Delay(1);
+            Task.Delay(4);
 
             uca = (byte)((cmd << 4) | backlight);
             device.WriteByte(uca);
@@ -58,7 +58,7 @@ namespace tmp102
 
             uca = (byte)((cmd << 4) | backlight);
             device.WriteByte(uca);
-            Task.Delay(1);
+            Task.Delay(4);
         }
 
 
@@ -75,9 +75,11 @@ namespace tmp102
             Write(device, 0x80, 0x08);  // set cursor to row 1, column 1
 
             // Clear the screen
-            Write(device, 0x80, 0x08);  // Clear the memory
+            Write(device, 0x0E, 0x08);  // Clear the memory
 
             // Test Msg
+            Write(device, 0xC0, 0x08);  // Set the cursor
+            
             var message = Encoding.ASCII.GetBytes("DOTNET 5.0");
             foreach (var cmd in message)
                 Write(device, cmd, 0x08);
