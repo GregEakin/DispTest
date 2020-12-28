@@ -123,26 +123,26 @@ namespace tmp102
         {
             // Setup 4-bit mode
             // See Figure 24, on page 46
-            
-	    // Wait for startup
+
+            // Wait for startup
             WaitForNotBusy(15000);
 
-            // Send three three time to get chip into sync
-            SendNibble(0x30);        // Function set 0b0011 - 8-bit
-            WaitForNotBusy(4100);
-            SendNibble(0x30);        // Function set 0b0011 - 8-bit
-            WaitForNotBusy(100);
-            SendNibble(0x30);        // Function set 0b0011 - 8-bit
-            WaitForNotBusy(37);
-
-            // Set 4-bit mode, 2-Line and font
-            // Number of display lines, and  font cannot be changed after this command 
-            SendNibble(0x20);        // Function set 0b0010 - 4-bit, as an 8-bit instruction
-            WaitForNotBusy(37);
-            SendNibble(0x20);        // Function set 0b0010 - 4-bit, as first 4-bit
-            WaitForNotBusy(37);
-            SendNibble(0xC0);        // Function set 0bnn** - 2-line, Font, as second 4-bit
-            WaitForNotBusy(37);
+            // // Send three three time to get chip into sync
+            // SendNibble(0x30);        // Function set 0b0011 - 8-bit
+            // WaitForNotBusy(4100);
+            // SendNibble(0x30);        // Function set 0b0011 - 8-bit
+            // WaitForNotBusy(100);
+            // SendNibble(0x30);        // Function set 0b0011 - 8-bit
+            // WaitForNotBusy(37);
+            //
+            // // Set 4-bit mode, 2-Line and font
+            // // Number of display lines, and  font cannot be changed after this command 
+            // SendNibble(0x20);        // Function set 0b0010 - 4-bit, as an 8-bit instruction
+            // WaitForNotBusy(37);
+            // SendNibble(0x20);        // Function set 0b0010 - 4-bit, as first 4-bit
+            // WaitForNotBusy(37);
+            // SendNibble(0xC0);        // Function set 0bnn** - 2-line, Font, as second 4-bit
+            // WaitForNotBusy(37);
 
             // While the chip supports 5x10 pixel characters for one line displays they
             // don't seem to be generally available. Supporting 5x10 would require extra
@@ -179,90 +179,31 @@ namespace tmp102
             set => _interface.BacklightOn = value;
         }
 
-        protected void SendNibble(byte cmd)
-        {
-            byte buffer;
+        /// <summary>
+        /// Sends byte to the device
+        /// </summary>
+        /// <param name="value">Byte to be sent to the device</param>
+        protected void SendData(byte value) => _interface.SendData(value);
 
-            buffer = (byte)((cmd & 0xF0) | 0x08);
-            _interface.SendCommand(buffer);
-            buffer = (byte)((cmd & 0xF0) | 0x08 | 0x04u);
-            _interface.SendCommand(buffer);
-            WaitForNotBusy(4);
-            buffer = (byte)((cmd & 0xF0) | 0x08);
-            _interface.SendCommand(buffer);
-        }
+        /// <summary>
+        /// Sends command to the device
+        /// </summary>
+        /// <param name="command">Byte representing the command to be sent</param>
+        protected void SendCommand(byte command) => _interface.SendCommand(command);
 
-        protected void SendCommand(byte cmd)
-        {
-            byte buffer;
+        /// <summary>
+        /// Sends data to the device
+        /// </summary>
+        /// <param name="values">Data to be send to the device</param>
+        protected void SendData(ReadOnlySpan<byte> values) => _interface.SendData(values);
 
-            // Wait for busy flag
+        /// <summary>
+        /// Send commands to the device
+        /// </summary>
+        /// <param name="commands">Each byte represents command being sent to the device</param>
+        protected void SendCommands(ReadOnlySpan<byte> commands) => _interface.SendCommands(commands);
 
-            buffer = (byte)((cmd & 0xF0) | 0x08);
-            _interface.SendCommand(buffer);
-            WaitForNotBusy(4);
-            buffer = (byte)((cmd & 0xF0) | 0x08 | 0x04u);
-            _interface.SendCommand(buffer);
-            WaitForNotBusy(4);
-            buffer = (byte)((cmd & 0xF0) | 0x08);
-            _interface.SendCommand(buffer);
-            WaitForNotBusy(37);
-            buffer = (byte)((cmd << 4) | 0x08);
-            _interface.SendCommand(buffer);
-            WaitForNotBusy(4);
-            buffer = (byte)((cmd << 4) | 0x08 | 0x04u);
-            _interface.SendCommand(buffer);
-            WaitForNotBusy(4);
-            buffer = (byte)((cmd << 4) | 0x08);
-            _interface.SendCommand(buffer);
-            WaitForNotBusy(37);
-        }
-
-        protected void SendData(byte value)
-        {
-            byte buffer;
-
-            // Wait for busy flag
-
-            buffer = (byte)((value & 0xF0) | 0x09);
-            _interface.SendCommand(buffer);
-            WaitForNotBusy(4);
-            buffer = (byte)((value & 0xF0) | 0x09 | 0x04u);
-            _interface.SendCommand(buffer);
-            WaitForNotBusy(4);
-            buffer = (byte)((value & 0xF0) | 0x09);
-            _interface.SendCommand(buffer);
-            WaitForNotBusy(37);
-            buffer = (byte)((value << 4) | 0x09);
-            _interface.SendCommand(buffer);
-            WaitForNotBusy(4);
-            buffer = (byte)((value << 4) | 0x09 | 0x04u);
-            _interface.SendCommand(buffer);
-            WaitForNotBusy(4);
-            buffer = (byte)((value << 4) | 0x09);
-            _interface.SendCommand(buffer);
-            WaitForNotBusy(37);
-        }
-
-        protected void SendCommands(ReadOnlySpan<byte> commands) // => _interface.SendCommands(commands);
-        {
-            // There is a limit to how much data the controller can accept at once. Haven't found documentation
-            // for this yet, can probably iterate a bit more on this to find a true "max". Not adding additional
-            // logic like SendData as we don't expect a need to send more than a handful of commands at a time.
-            if (commands.Length > 20)
-                throw new ArgumentOutOfRangeException(nameof(commands), "Too many commands in one request.");
-
-            foreach (var cmd in commands)
-                SendCommand(cmd);
-        }
-
-        protected void SendData(ReadOnlySpan<byte> values)
-        {
-            foreach (var value in values)
-                SendData(value);
-        }
-
-        protected virtual bool SetTwoLineMode(int rows) => rows > 1;
+        protected virtual bool GetTwoLineMode(int rows) => rows > 1;
 
 
         protected virtual byte[] InitializeRowOffsets(int rows)
@@ -290,7 +231,7 @@ namespace tmp102
             switch (rows)
             {
                 case 1:
-                    rowOffsets = new byte;
+                    rowOffsets = new byte[] { 0 };
                     break;
                 case 2:
                     rowOffsets = new byte[] { 0, 64 };

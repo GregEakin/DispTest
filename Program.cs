@@ -15,7 +15,7 @@ namespace tmp102
         {
             var settings = new I2cConnectionSettings(0x00, 0x27);
             using var device = new UnixI2cDevice(settings);
-            using var lcd = new Hd44780(new Size(16, 2), LcdInterface.CreateI2c(device));
+            using var lcd = new Hd44780(new Size(16, 2), new I2C4Bit(device));
 
             var name0 = File.ReadAllText("/sys/class/thermal/thermal_zone0/type").Substring(0, 3);
             var name1 = File.ReadAllText("/sys/class/thermal/thermal_zone1/type").Substring(0, 3);
