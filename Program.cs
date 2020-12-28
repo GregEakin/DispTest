@@ -15,8 +15,9 @@ namespace tmp102
         public Lcd(I2cDevice device)
             : base(device)
         {
-            Console.WriteLine("Eight bit mode = {0}", _interface.EightBitMode);
-            Console.WriteLine("Size {0}x{1}", Size.Width, Size.Height);
+            Console.WriteLine("Eight bit mode = {0}", _interface.EightBitMode); // True
+            Console.WriteLine("Wait {0}", _interface.WaitMultiplier);           // 
+            Console.WriteLine("Size {0}x{1}", Size.Width, Size.Height);         // 16x2
         }
 
     }
