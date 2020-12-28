@@ -181,69 +181,66 @@ namespace tmp102
 
         protected void SendNibble(byte cmd)
         {
-            Span<byte> buffer = stackalloc byte[2];
-            buffer[0] = 0x00;
+            byte buffer;
 
-            buffer[1] = (byte)((cmd & 0xF0) | 0x08);
-            _interface.SendData(buffer);
-            buffer[1] = (byte)((cmd & 0xF0) | 0x08 | 0x04u);
-            _interface.SendData(buffer);
+            buffer = (byte)((cmd & 0xF0) | 0x08);
+            _interface.SendCommand(buffer);
+            buffer = (byte)((cmd & 0xF0) | 0x08 | 0x04u);
+            _interface.SendCommand(buffer);
             WaitForNotBusy(4);
-            buffer[1] = (byte)((cmd & 0xF0) | 0x08);
-            _interface.SendData(buffer);
+            buffer = (byte)((cmd & 0xF0) | 0x08);
+            _interface.SendCommand(buffer);
         }
 
         protected void SendCommand(byte cmd)
         {
-            Span<byte> buffer = stackalloc byte[2];
-            buffer[0] = 0x00;
+            byte buffer;
 
             // Wait for busy flag
 
-            buffer[1] = (byte)((cmd & 0xF0) | 0x08);
-            _interface.SendData(buffer);
+            buffer = (byte)((cmd & 0xF0) | 0x08);
+            _interface.SendCommand(buffer);
             WaitForNotBusy(4);
-            buffer[1] = (byte)((cmd & 0xF0) | 0x08 | 0x04u);
-            _interface.SendData(buffer);
+            buffer = (byte)((cmd & 0xF0) | 0x08 | 0x04u);
+            _interface.SendCommand(buffer);
             WaitForNotBusy(4);
-            buffer[1] = (byte)((cmd & 0xF0) | 0x08);
-            _interface.SendData(buffer);
+            buffer = (byte)((cmd & 0xF0) | 0x08);
+            _interface.SendCommand(buffer);
             WaitForNotBusy(37);
-            buffer[1] = (byte)((cmd << 4) | 0x08);
-            _interface.SendData(buffer);
+            buffer = (byte)((cmd << 4) | 0x08);
+            _interface.SendCommand(buffer);
             WaitForNotBusy(4);
-            buffer[1] = (byte)((cmd << 4) | 0x08 | 0x04u);
-            _interface.SendData(buffer);
+            buffer = (byte)((cmd << 4) | 0x08 | 0x04u);
+            _interface.SendCommand(buffer);
             WaitForNotBusy(4);
-            buffer[1] = (byte)((cmd << 4) | 0x08);
-            _interface.SendData(buffer);
+            buffer = (byte)((cmd << 4) | 0x08);
+            _interface.SendCommand(buffer);
             WaitForNotBusy(37);
         }
 
         protected void SendData(byte value)
         {
-            Span<byte> buffer = stackalloc byte[2];
-            buffer[0] = 0x00;
+            byte buffer;
 
             // Wait for busy flag
 
-            buffer[1] = (byte)((value & 0xF0) | 0x09);
-            _interface.SendData(buffer);
+            buffer = (byte)((value & 0xF0) | 0x09);
+            _interface.SendCommand(buffer);
             WaitForNotBusy(4);
-            buffer[1] = (byte)((value & 0xF0) | 0x09 | 0x04u);
-            _interface.SendData(buffer);
+            buffer = (byte)((value & 0xF0) | 0x09 | 0x04u);
+            _interface.SendCommand(buffer);
             WaitForNotBusy(4);
-            buffer[1] = (byte)((value & 0xF0) | 0x09);
-            _interface.SendData(buffer);
+            buffer = (byte)((value & 0xF0) | 0x09);
+            _interface.SendCommand(buffer);
             WaitForNotBusy(37);
-            buffer[1] = (byte)((value << 4) | 0x09);
-            _interface.SendData(buffer);
+            buffer = (byte)((value << 4) | 0x09);
+            _interface.SendCommand(buffer);
             WaitForNotBusy(4);
-            buffer[1] = (byte)((value << 4) | 0x09 | 0x04u);
-            _interface.SendData(buffer);
+            buffer = (byte)((value << 4) | 0x09 | 0x04u);
+            _interface.SendCommand(buffer);
             WaitForNotBusy(4);
-            buffer[1] = (byte)((value << 4) | 0x09);
-            _interface.SendData(buffer);
+            buffer = (byte)((value << 4) | 0x09);
+            _interface.SendCommand(buffer);
             WaitForNotBusy(37);
         }
 
@@ -293,7 +290,7 @@ namespace tmp102
             switch (rows)
             {
                 case 1:
-                    rowOffsets = new byte[1];
+                    rowOffsets = new byte;
                     break;
                 case 2:
                     rowOffsets = new byte[] { 0, 64 };
