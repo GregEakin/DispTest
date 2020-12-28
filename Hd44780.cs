@@ -69,9 +69,9 @@ namespace tmp102
     /// most character LCD drivers are intended to be fully compatible with this chipset. Some examples: Sunplus SPLC780D, Sitronix ST7066U,
     /// Samsung KS0066U, Aiptek AIP31066, and many more.
     /// 
-    /// Some compatible chips extend the HD44780 with addtional pins and features. They are still fully compatible. The ST7036 is one example.
+    /// Some compatible chips extend the HD44780 with additional pins and features. They are still fully compatible. The ST7036 is one example.
     /// 
-    /// This implementation was drawn from numerous datasheets and libraries such as Adafruit_Python_CharLCD.
+    /// This implementation was drawn from numerous data sheets and libraries such as Adafruit_Python_CharLCD.
     /// </remarks>
     public class Hd44780 : IDisposable
     {
@@ -121,46 +121,86 @@ namespace tmp102
         /// </summary>
         private void Initialize(int rows)
         {
+            // Setup 4-bit mode
+            // See Figure 24, on page 46
+
             // Go into 4-bit mode.
             Span<byte> buffer = stackalloc byte[2];
-            buffer[0] = 0x00;
-            buffer[1] = 0x30;
-            _interface.SendData(buffer);
-            Thread.Sleep(5);
-            _interface.SendData(buffer);
-            Thread.Sleep(1);
-            _interface.SendData(buffer);
-            Thread.Sleep(5);
+            buffer[0] = 0x00;   // Space for I2C address
+            buffer[1] = 0x30;   // Function set
+
+            // Wait for startup
+            WaitForNotBusy(15000);
+
+            // Send three three time to get chip into sync
+            _interface.SendData(buffer);        // Function set 0b0011 - 8-bit
+            // Toggle E
+            WaitForNotBusy(4100);
+            
+            _interface.SendData(buffer);        // Function set 0b0011 - 8-bit
+            // Toggle E
+            WaitForNotBusy(100);
+            
+            _interface.SendData(buffer);        // Function set 0b0011 - 8-bit
+            // Toggle E
+            WaitForNotBusy(37);
+
+            // Set 4-bit mode, 2-Line and font
+            // Number of display lines, and  font cannot be changed after this command 
             buffer[1] = 0x20;
+            _interface.SendData(buffer);        // Function set 0b0010 - 4-bit, as an 8-bit instruction
+            // Toggle E
+            WaitForNotBusy(37);
+            _interface.SendData(buffer);        // Function set 0b0010 - 4-bit, as first 4-bit
+            // Toggle E
+            WaitForNotBusy(37);
+            buffer[1] = 0x80;
+            _interface.SendData(buffer);        // Function set 0bnn** - 2-line, Font, as second 4-bit
+            // Toggle E
+            WaitForNotBusy(37);
+
+            // Display on
+            // buffer[1] = 0x00;
+            // _interface.SendData(buffer);        // Display set 0b0000
+            // buffer[1] = 0xC0;
+            // _interface.SendData(buffer);        // Display set 0b1nnn - Display, Cursor, Blink
+            // WaitForNotBusy(37);
+            
+            // Clear entire display
+            // buffer[1] = 0x00;
+            // _interface.SendData(buffer);        // Clear display 0b0000
+            // buffer[1] = 0x10;
+            // _interface.SendData(buffer);        // Clear display 0b0001 - Clear entire display
+            // // WaitForNotBusy(4100);
+            
+            // Set Mode
+            // buffer[1] = 0x00;
+            // _interface.SendData(buffer);        // Entry Mode set 0b0000
+            // buffer[1] = 0x60;
+            // _interface.SendData(buffer);        // Entry Mode set 0b01nn - I/D and S
+            // WaitForNotBusy(37);
 
             // While the chip supports 5x10 pixel characters for one line displays they
             // don't seem to be generally available. Supporting 5x10 would require extra
             // support for CreateCustomCharacter
 
-            if (SetTwoLineMode(rows))
-            {
-                Console.WriteLine("Function: Two Line.");
-                _displayFunction |= DisplayFunction.TwoLine;
-            }
+            // if (SetTwoLineMode(rows))
+            //     _displayFunction |= DisplayFunction.TwoLine;
 
             _displayControl |= DisplayControl.DisplayOn;
-            Console.WriteLine("Control: Display on");
-            
             _displayMode |= DisplayEntryMode.Increment;
-            Console.WriteLine("Entry: Inc cursor");
-
             ReadOnlySpan<byte> commands = stackalloc byte[]
             {
                 // Function must be set first to ensure that we always have the basic
                 // instruction set selected. (See PCF2119x datasheet Function_set note
                 // for one documented example of where this is necessary.)
                 // @@ ReturnHomeCommand,    // 0x02
-                (byte)_displayFunction,     // 0x28
+                // (byte)_displayFunction,  // 0x28
                 (byte)_displayControl,      // 0x0c
-                (byte)_displayMode,         // 0x06
                 ClearDisplayCommand,        // 0x01
-                (byte)0x80,                 // 0x80
-                (byte)0x0E,                 // 0x0E <-- not valid?
+                (byte)_displayMode,         // 0x06
+                (byte)0x80,                 // 0x80 - Sets address
+                // (byte)0x0E,                 // 0x0E <-- not valid?
             };
 
             SendCommands(commands);
@@ -177,66 +217,50 @@ namespace tmp102
 
         protected void SendData(byte value)
         {
-            Console.WriteLine("Send data: 0x{0:x2}", value);
-
             Span<byte> buffer = stackalloc byte[2];
             buffer[0] = 0x00;
 
+            // Wait for busy flag
+
             buffer[1] = (byte)((value & 0xF0) | 0x09);
             _interface.SendData(buffer);
-            Thread.Sleep(1);
-
             buffer[1] = (byte)((value & 0xF0) | 0x09 | 0x04u);
             _interface.SendData(buffer);
-            Thread.Sleep(1);
-
+            WaitForNotBusy(4);
             buffer[1] = (byte)((value & 0xF0) | 0x09);
             _interface.SendData(buffer);
-            Thread.Sleep(1);
-
             buffer[1] = (byte)((value << 4) | 0x09);
             _interface.SendData(buffer);
-            Thread.Sleep(1);
-
             buffer[1] = (byte)((value << 4) | 0x09 | 0x04u);
             _interface.SendData(buffer);
-            Thread.Sleep(1);
-
+            WaitForNotBusy(4);
             buffer[1] = (byte)((value << 4) | 0x09);
             _interface.SendData(buffer);
-            Thread.Sleep(1);
         }
 
         protected void SendCommand(byte cmd)
         {
             Console.WriteLine("Send cmd: 0x{0:x2}", cmd);
-            
+
             Span<byte> buffer = stackalloc byte[2];
             buffer[0] = 0x00;
 
-            buffer[1] = (byte) ((cmd & 0xF0) | 0x08);
-            _interface.SendData(buffer);
-            Thread.Sleep(1);
+            // Wait for busy flag
 
-            buffer[1] = (byte) ((cmd & 0xF0) | 0x08 | 0x04u);
+            buffer[1] = (byte)((cmd & 0xF0) | 0x08);
             _interface.SendData(buffer);
-            Thread.Sleep(1);
-
-            buffer[1] = (byte) ((cmd & 0xF0) | 0x08);
+            buffer[1] = (byte)((cmd & 0xF0) | 0x08 | 0x04u);
             _interface.SendData(buffer);
-            Thread.Sleep(1);
-
-            buffer[1] = (byte) ((cmd << 4) | 0x08);
+            WaitForNotBusy(4);
+            buffer[1] = (byte)((cmd & 0xF0) | 0x08);
             _interface.SendData(buffer);
-            Thread.Sleep(1);
-
-            buffer[1] = (byte) ((cmd << 4) | 0x08 | 0x04u);
+            buffer[1] = (byte)((cmd << 4) | 0x08);
             _interface.SendData(buffer);
-            Thread.Sleep(1);
-
-            buffer[1] = (byte) ((cmd << 4) | 0x08);
+            buffer[1] = (byte)((cmd << 4) | 0x08 | 0x04u);
             _interface.SendData(buffer);
-            Thread.Sleep(1);
+            WaitForNotBusy(4);
+            buffer[1] = (byte)((cmd << 4) | 0x08);
+            _interface.SendData(buffer);
         }
 
 
@@ -251,10 +275,9 @@ namespace tmp102
             // There is a limit to how much data the controller can accept at once. Haven't found documentation
             // for this yet, can probably iterate a bit more on this to find a true "max". Not adding additional
             // logic like SendData as we don't expect a need to send more than a handful of commands at a time.
-
             if (commands.Length > 20)
                 throw new ArgumentOutOfRangeException(nameof(commands), "Too many commands in one request.");
-            
+
             foreach (var cmd in commands)
                 SendCommand(cmd);
         }
@@ -348,7 +371,7 @@ namespace tmp102
         /// <param name="top">The row position from the top starting with 0.</param>
         public void SetCursorPosition(int left, int top)
         {
-            int rows = _rowOffsets.Length;
+            var rows = _rowOffsets.Length;
             if (top < 0 || top >= rows)
                 throw new ArgumentOutOfRangeException(nameof(top));
 
@@ -356,7 +379,7 @@ namespace tmp102
             // larger than the max "good" address. Addressing is covered in detail in
             // InitializeRowOffsets above.
 
-            int newAddress = left + _rowOffsets[top];
+            var newAddress = left + _rowOffsets[top];
             if (left < 0 || (rows == 1 && newAddress >= 80) || (rows > 1 && newAddress >= 104))
                 throw new ArgumentOutOfRangeException(nameof(left));
 
@@ -512,11 +535,9 @@ namespace tmp102
         /// <param name="value">Text to be displayed.</param>
         public void Write(string value)
         {
-            byte[] buffer = ArrayPool<byte>.Shared.Rent(value.Length);
-            for (int i = 0; i < value.Length; ++i)
-            {
+            var buffer = ArrayPool<byte>.Shared.Rent(value.Length);
+            for (var i = 0; i < value.Length; ++i)
                 buffer[i] = (byte)value[i];
-            }
 
             SendData(new ReadOnlySpan<byte>(buffer, 0, value.Length));
             ArrayPool<byte>.Shared.Return(buffer);
@@ -525,18 +546,16 @@ namespace tmp102
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
-            {
                 _interface?.Dispose();
-            }
         }
 
         public void Dispose()
         {
-            if (!_disposed)
-            {
-                Dispose(true);
-                _disposed = true;
-            }
+            if (_disposed)
+                return;
+
+            Dispose(true);
+            _disposed = true;
         }
     }
 }
