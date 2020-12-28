@@ -32,24 +32,48 @@ namespace tmp102
         [DllImport("libc.so.6", EntryPoint = "usleep")]
         internal static extern int usleep(uint useconds);
 
+        public static void Write(UnixI2cDevice device, byte cmd, byte backlight)
+        {
+            byte uca = cmd;
+            uca = (byte)((cmd & 0xF0u) | backlight);
+            device.WriteByte(uca);
+
+            uca = (byte)((cmd & 0xF0u) | backlight | 0x04u);
+            device.WriteByte(uca);
+
+            uca = (byte)((cmd & 0xF0u) | backlight);
+            device.WriteByte(uca);
+
+            uca = (byte)((cmd << 4) | backlight);
+            device.WriteByte(uca);
+
+            uca = (byte)((cmd << 4) | backlight | 0x04u);
+            device.WriteByte(uca);
+
+            uca = (byte)((cmd << 4) | backlight);
+            device.WriteByte(uca);
+        }
+        
+        
         public static void Main(string[] args)
         {
             var settings = new I2cConnectionSettings(0x00, 0x27);
             using var device = new UnixI2cDevice(settings);
 
             // Init
-            device.WriteByte(0x02);  // Set 4-bit mode of LCD controller
-            device.WriteByte(0x28);  // 2 line, 5x8 dot matrix
-            device.WriteByte(0x0C);  // display on, cursor off
-            device.WriteByte(0x06);  // inc cursor to right when writing and don't scroll
-            device.WriteByte(0x80);  // set cursor to row 1, column 1
+            Write(device, 0x02, 0x08);  // Set 4-bit mode of LCD controller
+            Write(device, 0x28, 0x08);  // 2 line, 5x8 dot matrix
+            Write(device, 0x0C, 0x08);  // display on, cursor off
+            Write(device, 0x06, 0x08);  // inc cursor to right when writing and don't scroll
+            Write(device, 0x80, 0x08);  // set cursor to row 1, column 1
 
             // Clear the screen
-            device.WriteByte(0x0E);  // Clear the memory
+            Write(device, 0x80, 0x08);  // Clear the memory
 
             // Test Msg
             var message = Encoding.ASCII.GetBytes("DOTNET 5.0");
-            device.Write(message);
+            foreach (var cmd in message)
+                Write(device, cmd, 0x08);
         }
 
         public static void Main2(string[] args)
