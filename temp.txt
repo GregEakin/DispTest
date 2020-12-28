@@ -1,0 +1,41 @@
+https://www.kernel.org/doc/Documentation/thermal/sysfs-api.txt
+
+/sys/class/thermal:
+|thermal_zone0:
+    |---type:			cpu-thermal
+    |---temp:			41100
+    |---mode:			enalbed
+    |---policy:			step_wise
+    |---available_policies:	step_wise
+    |---cdev0:			--->/sys/class/thermal/cooling_device0
+    |---cdev1:			--->/sys/class/thermal/cooling_device1
+    |---cdev2:			--->/sys/class/thermal/cooling_device1
+    |---cdev3:			--->/sys/class/thermal/cooling_device2
+    |---cdev4:			--->/sys/class/thermal/cooling_device2
+
+|thermal_zone1:
+    |---type:			ddr-thermal
+    |---temp:			43400
+    |---mode:			enalbed
+    |---policy:			step_wise
+    |---available_policies:	step_wise
+
+|cooling_device0:
+    |---type:			khadas-mcu-fan
+    |---max_state:		3
+    |---cur_state:		0
+
+|cooling_device1:
+    |---type:			thermal-cpufreq-0
+    |---max_state:		10
+    |---cur_state:		10
+
+|cooling_device2:
+    |---type:			thermal-cpufreq-1
+    |---max_state:		0
+    |---cur_state:		14
+
+/sys/class/hwmon:
+    |---hwmon0/name:		khdas-mcu-fan
+    |---hwmon1/name:		nvme
+
