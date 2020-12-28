@@ -16,6 +16,7 @@ namespace tmp102
             : base(device)
         {
             Console.WriteLine("Eight bit mode = {0}", _interface.EightBitMode);
+            Console.WriteLine("Size {0}x{1}", Size.Width, Size.Height);
         }
 
     }
@@ -81,10 +82,15 @@ namespace tmp102
             using var device = new UnixI2cDevice(settings);
             Console.WriteLine("Connection {0}", device.ConnectionSettings);
             Console.WriteLine("device path {0}", device.DevicePath);
-            
+
+            // {
+            //     using var xx = LcdInterface.CreateI2c(device);
+            //     xx.BacklightOn = true;
+            // }
+
             // using var lcd = new Lcd1602(18, 5, new int[] { 6, 16, 20, 21 });
-            using var lcd = new Lcd(device);
-            
+            var lcd = new Lcd1602(device);
+
             lcd.DisplayOn = true;
             
             lcd.Clear();
@@ -92,7 +98,7 @@ namespace tmp102
             lcd.Write("Hello World!");
             
             Thread.Sleep(5000);
-
+            
             lcd.Clear();
             lcd.DisplayOn = false;
         }
