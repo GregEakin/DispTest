@@ -8,6 +8,7 @@ using Iot.Device.CharacterLcd;
 using System;
 using System.Buffers;
 using System.Drawing;
+using System.Threading;
 
 namespace tmp102
 {
@@ -153,23 +154,25 @@ namespace tmp102
             Span<byte> buffer = stackalloc byte[2];
             buffer[0] = 0x00;
 
-            buffer[1] = (byte)((value & 0xF0) | 0x01);
+            buffer[1] = (byte)((value & 0xF0) | 0x09);
             _interface.SendData(buffer);
 
-            buffer[1] = (byte)((value & 0xF0) | 0x01 | 0x04u);
+            buffer[1] = (byte)((value & 0xF0) | 0x09 | 0x04u);
             _interface.SendData(buffer);
 
-            buffer[1] = (byte)((value & 0xF0) | 0x01);
+            buffer[1] = (byte)((value & 0xF0) | 0x09);
+            _interface.SendData(buffer);
+            Thread.Sleep(1);
+
+            buffer[1] = (byte)((value << 4) | 0x09);
             _interface.SendData(buffer);
 
-            buffer[1] = (byte)((value << 4) | 0x01);
+            buffer[1] = (byte)((value << 4) | 0x09 | 0x04u);
             _interface.SendData(buffer);
 
-            buffer[1] = (byte)((value << 4) | 0x01 | 0x04u);
+            buffer[1] = (byte)((value << 4) | 0x09);
             _interface.SendData(buffer);
-
-            buffer[1] = (byte)((value << 4) | 0x01);
-            _interface.SendData(buffer);
+            Thread.Sleep(1);
         }
 
         protected void SendCommand(byte cmd)
@@ -185,6 +188,7 @@ namespace tmp102
 
             buffer[1] = (byte) ((cmd & 0xF0) | 0x08);
             _interface.SendData(buffer);
+            Thread.Sleep(1);
 
             buffer[1] = (byte) ((cmd << 4) | 0x08);
             _interface.SendData(buffer);
@@ -194,6 +198,7 @@ namespace tmp102
 
             buffer[1] = (byte) ((cmd << 4) | 0x08);
             _interface.SendData(buffer);
+            Thread.Sleep(1);
         }
 
 
