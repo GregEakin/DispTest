@@ -4,6 +4,7 @@ using System.Device.I2c.Drivers;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Iot.Device.CharacterLcd;
 
@@ -68,8 +69,21 @@ namespace tmp102
             var settings = new I2cConnectionSettings(0x00, 0x27);
             using var device = new UnixI2cDevice(settings);
             // using var lcd = new Lcd1602(18, 5, new int[] { 6, 16, 20, 21 });
-            using var lcd = new Lcd1602(device);
+            using var lcd = new Lcd1602(device)
+            {
+                DisplayOn = true, 
+                BacklightOn = true
+            };
+            
+            lcd.Clear();
+            lcd.Home();
             lcd.Write("Hello World!");
+            
+            Thread.Sleep(5000);
+
+            lcd.Clear();
+            lcd.DisplayOn = false;
+            lcd.BacklightOn = false;
         }
 
         public static void Main3(string[] args)
