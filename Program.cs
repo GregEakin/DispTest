@@ -91,12 +91,15 @@ namespace tmp102
                     var div = j / 5;   // 0 - 19
                     var mod = j % 5;    // 0 - 4
 
-                    lcd.SetCursorPosition(0, 3);
-                    for (var k = 0; k < div; k++) 
-                        lcd.Write("\x4");
-                    lcd.Write($"{(char)mod}");
+                    var build = new StringBuilder();
+                    for (var k = 0; k < div; k++)
+                        build.Append("\x4");
+                    build.Append($"{(char)mod}");
                     for (var k = div + 1; k < 20; k++)
-                        lcd.Write(" ");
+                        build.Append(" ");
+
+                    lcd.SetCursorPosition(0, 3);
+                    lcd.Write(build.ToString());
                 }
             }
 
