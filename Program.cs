@@ -88,7 +88,7 @@ namespace tmp102
                 // 20 * 5
                 for (var j = 0; j < 100; j++)
                 {
-                    var div = j / 20;   // 0 - 19
+                    var div = j / 5;   // 0 - 19
                     var mod = j % 5;    // 0 - 4
 
                     lcd.SetCursorPosition(0, 3);
