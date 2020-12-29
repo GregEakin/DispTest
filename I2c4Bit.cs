@@ -60,18 +60,15 @@ namespace tmp102
 
         protected void SendNibble(byte command)
         {
-            var data = (byte)(command | (byte)(BacklightOn ? ControlByteFlags.Backlight : 0x00));
+            var buffer = (byte)(command | (byte)(BacklightOn ? ControlByteFlags.Backlight : 0x00));
 
-            Span<byte> buffer = stackalloc byte[] { 0x00, data };
-            _device.Write(buffer);
+            _device.WriteByte(buffer);
             WaitForNotBusy(1);
 
-            buffer[1] = (byte)(data | (byte)ControlByteFlags.Enabled);
-            _device.Write(buffer);
+            _device.WriteByte((byte)(buffer | (byte)ControlByteFlags.Enabled));
             WaitForNotBusy(1);
 
-            buffer[1] = data;
-            _device.Write(buffer);
+            _device.WriteByte(buffer);
             WaitForNotBusy(24);
         }
 
