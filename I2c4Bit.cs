@@ -64,11 +64,11 @@ namespace tmp102
 
             Span<byte> buffer = stackalloc byte[] { 0x00, data };
             _device.Write(buffer);
-            WaitForNotBusy(24);
+            WaitForNotBusy(1);
 
             buffer[1] = (byte)(data | (byte)ControlByteFlags.Enabled);
             _device.Write(buffer);
-            WaitForNotBusy(24);
+            WaitForNotBusy(1);
 
             buffer[1] = data;
             _device.Write(buffer);
