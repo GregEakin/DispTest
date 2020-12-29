@@ -2,6 +2,7 @@
 using System.Device.I2c.Drivers;
 using System.Drawing;
 using System.IO;
+using System.Text;
 using System.Threading;
 
 namespace tmp102
@@ -9,7 +10,7 @@ namespace tmp102
 
     class Program
     {
-        public static void ShowSpecialSymbols(Hd44780 lcd)
+        public static void ShowSpecialSymbols2(Hd44780 lcd)
         {
             // We have space for eight custom characters
             var bell = new byte[] { 0x04, 0x0e, 0x0e, 0x0e, 0x1f, 0x00, 0x04, 0x00 };
@@ -33,6 +34,25 @@ namespace tmp102
             lcd.SetCursorPosition(0, 3);
             var msg = $"\x0\x1\x2\x3\x4\x5\x6\x7 \x8\x9\xA";
             lcd.Write(msg);
+        }
+
+        public static byte[][] Data = 
+        {
+            new byte[]{0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10 },
+            new byte[]{0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18 },
+            new byte[]{0x1C, 0x1C, 0x1C, 0x1C, 0x1C, 0x1C, 0x1C, 0x1C },
+            new byte[]{0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x1E },
+            new byte[]{0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F },
+            new byte[]{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
+            new byte[]{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
+            new byte[]{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
+        };
+
+        public static void ShowSpecialSymbols(Hd44780 lcd)
+        {
+
+            for (var i = 0; i < 5; i++)
+                lcd.CreateCustomCharacter((byte)i, Data[i]);
         }
 
         public static void Main(string[] args)
@@ -63,7 +83,21 @@ namespace tmp102
                 lcd.SetCursorPosition(0, 1);
                 lcd.Write(msg1);
 
-                Thread.Sleep(500);
+                // Thread.Sleep(500);
+
+                // 20 * 5
+                for (var j = 0; j < 100; j++)
+                {
+                    var div = j / 20;   // 0 - 19
+                    var mod = j % 5;    // 0 - 4
+
+                    lcd.SetCursorPosition(0, 3);
+                    for (var k = 0; k < div; k++) 
+                        lcd.Write("\x4");
+                    lcd.Write($"{(char)mod}");
+                    for (var k = div + 1; k < 20; k++)
+                        lcd.Write(" ");
+                }
             }
 
             lcd.BacklightOn = false;
