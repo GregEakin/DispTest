@@ -106,12 +106,6 @@ namespace tmp102
             Size = size;
             _interface = @interface;
 
-            // if (_interface.EightBitMode)
-            // {
-            //     Console.WriteLine("Function: Eight bit.");
-            //     _displayFunction |= DisplayFunction.EightBit;
-            // }
-
             Initialize(size.Height);
             _rowOffsets = InitializeRowOffsets(size.Height);
         }
@@ -126,23 +120,6 @@ namespace tmp102
 
             // Wait for startup
             WaitForNotBusy(15000);
-
-            // // Send three three time to get chip into sync
-            // SendNibble(0x30);        // Function set 0b0011 - 8-bit
-            // WaitForNotBusy(4100);
-            // SendNibble(0x30);        // Function set 0b0011 - 8-bit
-            // WaitForNotBusy(100);
-            // SendNibble(0x30);        // Function set 0b0011 - 8-bit
-            // WaitForNotBusy(37);
-            //
-            // // Set 4-bit mode, 2-Line and font
-            // // Number of display lines, and  font cannot be changed after this command 
-            // SendNibble(0x20);        // Function set 0b0010 - 4-bit, as an 8-bit instruction
-            // WaitForNotBusy(37);
-            // SendNibble(0x20);        // Function set 0b0010 - 4-bit, as first 4-bit
-            // WaitForNotBusy(37);
-            // SendNibble(0xC0);        // Function set 0bnn** - 2-line, Font, as second 4-bit
-            // WaitForNotBusy(37);
 
             // While the chip supports 5x10 pixel characters for one line displays they
             // don't seem to be generally available. Supporting 5x10 would require extra

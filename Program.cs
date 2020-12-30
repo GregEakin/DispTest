@@ -36,7 +36,7 @@ namespace tmp102
             lcd.Write(msg);
         }
 
-        public static byte[][] Data = 
+        public static byte[][] Data =
         {
             new byte[]{0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10 },
             new byte[]{0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18 },
@@ -67,7 +67,7 @@ namespace tmp102
             lcd.BacklightOn = true;
             ShowSpecialSymbols(lcd);
 
-            for (var i = 0; i < 16*16; i++)
+            for (var i = 0; i < 16 * 16; i++)
             {
                 var temp0 = File.ReadAllText("/sys/class/thermal/thermal_zone0/temp");
                 var x0 = float.Parse(temp0);
@@ -84,17 +84,17 @@ namespace tmp102
                 lcd.Write(msg1);
 
                 // Thread.Sleep(500);
-		ShowSpecialSymbols(lcd);
+                ShowSpecialSymbols(lcd);
 
-                    var build = new StringBuilder();
-                    lcd.SetCursorPosition(0, 3);
+                var build = new StringBuilder();
+                lcd.SetCursorPosition(0, 3);
 
-                    for (var j = 0; j < 20; j++)
-                        build.Append($"{(char)(16*(i/16) + j)}");
-                    lcd.SetCursorPosition(0, 3);
-                    lcd.Write(build.ToString());
+                for (var j = 0; j < 20; j++)
+                    build.Append($"{(char)(16 * (i / 16) + j)}");
+                lcd.SetCursorPosition(0, 3);
+                lcd.Write(build.ToString());
 
-	    }
+            }
 
             lcd.BacklightOn = false;
             lcd.Clear();
