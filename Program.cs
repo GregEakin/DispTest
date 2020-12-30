@@ -67,7 +67,7 @@ namespace tmp102
             lcd.BacklightOn = true;
             ShowSpecialSymbols(lcd);
 
-            for (var i = 0; i < 200; i++)
+            for (var i = 0; i < 16*16; i++)
             {
                 var temp0 = File.ReadAllText("/sys/class/thermal/thermal_zone0/temp");
                 var x0 = float.Parse(temp0);
@@ -84,24 +84,17 @@ namespace tmp102
                 lcd.Write(msg1);
 
                 // Thread.Sleep(500);
-
-                // 20 * 5
-                for (var j = 0; j < 100; j++)
-                {
-                    var div = j / 5;   // 0 - 19
-                    var mod = j % 5;    // 0 - 4
+		ShowSpecialSymbols(lcd);
 
                     var build = new StringBuilder();
-                    for (var k = 0; k < div; k++)
-                        build.Append("\x4");
-                    build.Append($"{(char)mod}");
-                    for (var k = div + 1; k < 20; k++)
-                        build.Append(" ");
+                    lcd.SetCursorPosition(0, 3);
 
+                    for (var j = 0; j < 20; j++)
+                        build.Append($"{(char)(16*(i/16) + j)}");
                     lcd.SetCursorPosition(0, 3);
                     lcd.Write(build.ToString());
-                }
-            }
+
+	    }
 
             lcd.BacklightOn = false;
             lcd.Clear();
