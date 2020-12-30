@@ -1,6 +1,6 @@
-# NET IoT for LCD siplays: 4x20 and 2x16
+# NET IoT for LCD Displays: 4x20 and 2x16
 
-## Diplays
+## Displays
 * [LCD 16x2](http://wiki.sunfounder.cc/index.php?title=LCD1602_Module)
 * [LCD 20x4](http://wiki.sunfounder.cc/index.php?title=I2C_LCD2004)
 
@@ -70,15 +70,15 @@ protected void Initialize()
     SendNibble(0x30);        // Function set 0b0011 - 8-bit
     WaitForNotBusy(150);
 
-    // Put it back in 4-bit mode, with two-lines and a 5x8 font
+    // Put it back in 4-bit mode, with two lines and a 5x8 font
     SendNibble(0x20);        // Function set 0b0010 - 4-bit, as an 8-bit instruction
     WaitForNotBusy(37);
     SendNibble(0x20);        // Function set 0b0010 - 4-bit, as the first 4-bits
     WaitForNotBusy(37);
-    SendNibble(0xC0);        // Function set 0bnn** - 2-line, Font, as the second 4-bits
+    SendNibble(0xC0);        // Function set 0bnn** - 2-line and 5x8 Font, as the second 4-bits
     WaitForNotBusy(37);
 
-    // Number of display lines, and  font cannot be changed after this command 
+    // Number of display lines, and font cannot be changed after this command 
 }
 ```
 
